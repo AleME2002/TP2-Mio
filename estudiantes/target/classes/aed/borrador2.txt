@@ -1,0 +1,168 @@
+// CLASE ESTUDIANTE PARA QUE TENGA ENCAPSULAMIENEUTO
+
+package aed; 
+
+public class Estudiante {
+    private int id;
+    private int fila;
+    private int columna;
+    private int correctas;
+    private int respondidas;
+    private double nota;
+    private boolean entrego;
+    private boolean sospechoso;
+    private Examen examen;
+
+
+    /*/
+    ¿QUE HAY ACA?
+        PONER COSAS DE LOS VECINOS EN ESTA PARTE 
+        - obtenerRespuestasCorrectas() O(1)
+        - obtenerPreguntasRespondidas() O(1)
+        - obtenerNota() O(1)
+        - obtenerEstadoEntrega() O(1)
+        - obtenerEstadoSospechoso() O(1)
+        - obtenerExamen() O(1)
+        - obtenerRespuesta() O(1)
+
+        - marcarEntregado() O(1)
+        - marcarSospechoso(boolean esSospechoso) O(1)
+        - cambiarNota(double nota) O(1)
+
+        - resolverPregunta(int nroPregunta, int respuesta, int respuestaCorrecta) O(1)
+        - copiarPregunta(int nroPregunta, Examen examenOrigen) O(1)
+        - cambiarExamenCompleto(int[] nuevoExamen, int[] examenCanonico) O(R)
+        - tienePreguntaSinResponder(int nroPregunta) O(1)
+        - cantidadPreguntasQueMeFaltan(Estudiante otro) O(R)
+        - encontrarPrimeraPreguntaParaCopiar(Estudiante otro) O(R)
+        - copiarPrimeraPregunta(Estudiante otro, int[] examenCanonico) O(R)
+
+
+
+    /*/
+    ---- CONSTRUCTOR 
+    public Estudiante(int id, int cantPreguntas, int ladoAula){
+        this.id = id;                                                           // O(1)                        // O(1)
+        this.correctas = 0;                                                     // O(1)
+        this.respondidas = 0;
+        this.nota = 0.0;                                                          // O(1)
+        this.entrego = false;                                                   // O(1)
+        this.sospechoso = true;                                                 // O(1)
+        this.examen = new Examen(cantPreguntas);                                // O(R)
+        calcularPosicion(ladoAula);                                             // O(1)
+    } // Complejidad: O(R)
+
+    private void calcularPosicion(int ladoAula) {
+        int estudiantesPorFila = (ladoAula + 1) / 2;
+        this.fila = id / estudiantesPorFila;
+        this.columna = (id % estudiantesPorFila) * 2;
+    } // O(1)
+
+    ---- PARA OBTENER ATRIBUTOS PRIVADOS 
+    public int obtenerRespuestasCorrectas() {
+        return correctas; 
+    } // O(1)
+
+    public int obtenerPreguntasRespondidas() {
+        return respondidas; 
+    } // O(1)
+
+    public double obtenerNota() {
+        return nota; 
+    } // O(1)
+
+    public boolean obtenerEstadoEntrega() {
+        return entrego; 
+    } // O(1)
+
+    public boolean obtenerEstadoSospechoso() {
+        return sospechoso; 
+    } // O(1)
+
+    public Examen obtenerExamen() {
+        return examen; 
+    } // O(1)
+
+    public int obtenerRespuesta(int nroPregunta) {
+        return this.examen.obtenerRespuesta(nroPregunta);       
+    } // O(1)
+
+    ---- PARA REALIZAR CAMBIOS 
+    public void marcarEntregado() {
+        this.entrego = true; 
+    } // O(1)
+
+    public void marcarSospechoso(boolean esSospechoso) {
+        this.sospechoso = esSospechoso; 
+    } // O(1)
+
+    public void cambiarNota(double nota) {
+        this.nota = nota; 
+    } // O(1)
+
+
+    ---- PARA CALCUALR COSILLAS 
+    // Resuelve una pregunta y mantiene nota actualizada en O(1) 
+    public void resolverPregunt(int nroPregunta, int respuesta, int respuestaCorrecta) {
+        
+        // para hacer algo, no la tiene que tener respondida 
+        if (this.examen.obtenerRespuesta(nroPregunta) == -1) {
+            this.examen.resolverPregunta(nroPregunta, respuesta);
+            this.respondidas++;
+
+            if (respuesta == respuestaCorrecta) {
+                this.correctas++; 
+            }
+
+            this.actualizarNota();
+        } // O(1)
+    }
+
+    // copia la pregunta de otro examen
+    public void copiarPregunta(int nroPregunta, Examen examenCanonico) {
+        if (this.examen.tienePreguntaSinResponder(nroPregunta)) {
+            int respuesta = examenCanonico.obtenerRespuesta(nroPregunta); 
+            this.examen.resolverPregunta(nroPregunta, respuesta); 
+        }        
+    }
+
+    public void actualizarNota() {}
+
+    public void cambiarExamenCompleto() {}
+
+    public boolean tienePreguntaSinResponder(int nroPregunta) {
+        return this.examen.tienePreguntaSinResponder(nroPregunta); 
+    } // O(1)
+
+    // PARA MEJOR VECINO
+    public int cantidadPreguntasQueMeFaltan(Estudiante otro) {
+        return this.examen.cantidadPreguntasFaltantes(otro.obtenerExamen()); 
+    } // O(R)
+
+    // encuentra la primera pregunta para copiar del VECINO
+    public int encontrarPrimeraPreguntaParaCopiar(Estudiante otro) {
+        return this.examen.encontrarPrimeraPreguntaParaCopiar(otro.obtenerExamen()); 
+    } // O(R)
+
+    // copia la primera preugnta del vecino 
+    public void copiarPrimeraPregunta(Estudiante otro, int[] examenCanonico) {
+        int preguntaACopiar = this.encontrarPrimeraPreguntaParaCopiar(otro); // o(r)
+
+        if (preguntaACopiar !=-1) {
+            this.copiarPregunta(preguntaACopiar, otro.obtenerExamen()); 
+        } // O(1)
+        // ACTUALIZAR LAS COSAS QUE ME FALTAN ¿?
+    } // O(R)
+
+
+    public boolean esVecino(Estudiante otro, int ladoAula) {}
+    
+    public Estudiante[] obtenerIdsPosiblesVecinos(int ladoAula, int cantEstudiantes ¿?) {}
+
+
+
+
+
+
+}
+
