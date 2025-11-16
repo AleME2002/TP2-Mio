@@ -3,16 +3,16 @@ package aed;
 // Crear estudiante O(R)
 
 public class Estudiante {
-    int id;
-    int fila;
-    int columna;
-    int correctas;
-    int respondidas;
-    double nota;
-    boolean entrego;
-    boolean sospechoso;
-    Examen examen;
-    HeapMin.HandleEst handle;
+    private int id;
+    private int fila;
+    private int columna;
+    private int correctas;
+    private int respondidas;
+    private double nota;
+    private boolean entrego;
+    private boolean sospechoso;
+    private Examen examen;
+    private HeapMin.HandleEst handle;
 
 
 //------------------------------------------------------------------------Constructor--------------------------------------------------
@@ -77,7 +77,7 @@ public class Estudiante {
     } // O(1)
 
     public int obtenerRespuesta(int nroPregunta) {
-        return this.examen.preguntas[nroPregunta];       
+        return this.examen.obtenerExamen()[nroPregunta];       
     } // O(1)
 
 

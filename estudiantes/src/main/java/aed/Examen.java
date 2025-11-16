@@ -3,7 +3,7 @@ package aed;
 // Crear Examen O(R)
 
 public class Examen {
-    int[] preguntas;
+    private int[] preguntas;
 
 //------------------------------------------------------------------------Constructor----------------------------------------------------------
 
@@ -13,6 +13,12 @@ public class Examen {
             this.preguntas[i] = -1;                                                     // O(1)
         }
     } // Complejidad: O(R)
+
+    public int[] obtenerExamen(){
+        return this.preguntas;
+    }
+
+    public void reolverPregunta()
 
 //------------------------------------------------------------------------Preguntas faltantes--------------------------------------------------
 

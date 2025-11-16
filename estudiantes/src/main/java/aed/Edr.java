@@ -14,6 +14,89 @@ public class Edr {
     private int cantPreguntas;
     // Usamos muchos atributos ya que no nos dieron limite de almacenamiento, pero muchos se pueden sacar de otro lado
 
+    public class HandleEst {
+        private int pos; 
+        private Estudiante est; 
+
+        public HandleEst(Estudiante e) { 
+            this.est = e;                                           // O(1)
+        }
+
+        public Estudiante obtenerEstudiante() {
+            return this.est;                                        // O(1)
+        }
+
+        public double obtenerNota() {
+            return this.est.obtenerNota();                          // O(1)
+        }
+
+        public boolean obtenerEntrego() {
+            return this.est.obtenerEstadoEntrega();                 // O(1)
+        }
+
+        public int obtenerId() {
+            return this.est.obtenerId();                            // O(1)
+        }
+
+        public int obtenerPosicion() {
+            return this.pos;                            // O(1)
+        }
+
+        public void cambiarPosicionEnHeap(int pos){
+            this.pos = pos;
+        }
+        
+        
+        public int compareTo(HandleEst otro){
+            int idOriginal= this.obtenerId();
+            int idOtro = otro.obtenerId();
+
+            double notaOriginal = this.obtenerNota();
+            double notaOtro = otro.obtenerNota();
+
+            boolean estadoEntregaOriginal = this.obtenerEntrego();
+            boolean estadoEntregaOtro = otro.obtenerEntrego();
+
+            int res;
+
+            if( estadoEntregaOriginal != estadoEntregaOtro){  // caso uno entrego y otro no.
+
+                if(estadoEntregaOriginal == true){   // caso original  entrego y otro no. entonces original es menor.
+                    res=-1;
+                }
+                else{
+                    res =1;                         // caso original  no entrego y otro si. entonces original es mayor.
+                }
+            }
+            else{                                               // si ambos entregar tienen iguales, desempata menor nota.
+
+                if( notaOriginal != notaOtro){                  // caso no tienen notas iguales y tienen la misma entrego.
+
+                    if(notaOriginal > notaOtro){                // si el orginal tiene mayor nota que el otro, va a tener menor prioridad segun el criterio.
+                        res=-1;
+                    }
+                    else{
+                        res = 1;                                // si el original tiene menor nota que el otro, va a tener mayor prioridad segun el criterio.
+                    }
+                }
+                else{                                           // caso tienen mismo estado de entrega y misma nota
+
+                    if( idOriginal >= idOtro){
+                        res=-1;                                 // si tienen la misma nota, se prioriza el de menor id.
+                    }
+                    else{
+                        res=1;
+                    }
+                }
+            }
+            return res;
+        }   
+
+        //public vo id actualizarNota(double nuevaNota) {
+        //    miHea p.actualizarNotaDesdeHandle(id, nuevaNota);        // O(log E)
+        //} 
+    }   
+
     // Se puede modificar si agregamos cosas
     public Edr(int LadoAula, int Cant_estudiantes, int[] ExamenCanonico){
         this.examenCanonico = new Examen(ExamenCanonico.length);                            // O(R)
