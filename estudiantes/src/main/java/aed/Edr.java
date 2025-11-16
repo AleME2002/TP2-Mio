@@ -6,9 +6,8 @@ public class Edr {
     private HandleEst[] estudiantes;
     private Examen examenCanonico;
     private HeapMin idPorNotas;
-    private HeapMin estEnAulaPorNotas;
     private int ladoAula;
-    private int cantEst;
+    private int cantEstudiantes;
     private int cantEntregados;
     private int cantSospechosos;
     private int cantPreguntas;
@@ -18,8 +17,8 @@ public class Edr {
         private int pos; 
         private Estudiante est; 
 
-        private HandleEst(Estudiante e) { 
-            this.est = e;                                           // O(1)
+        private HandleEst(int id, int preguntas, int ladoAula) { 
+            this.est = new Estudiante(id, preguntas, ladoAula);                                           // O(1)
         }
 
         public Estudiante obtenerEstudiante() {
@@ -90,19 +89,19 @@ public class Edr {
     public Edr(int LadoAula, int Cant_estudiantes, int[] ExamenCanonico){
         this.examenCanonico = new Examen(ExamenCanonico.length);                            // O(R)
         
-        this.estudiantes = new Estudiante[Cant_estudiantes];                                // O(E)
+        this.estudiantes = new HandleEst[Cant_estudiantes];                                // O(E)
         this.ladoAula = LadoAula;                                                           // O(1)
-        this.cantEst = Cant_estudiantes;                                                    // O(1)
+        this.cantEstudiantes = Cant_estudiantes;                                                    // O(1)
         this.cantEntregados = 0;                                                            // O(1)
         this.cantSospechosos = 0;
         this.cantPreguntas = ExamenCanonico.length;
-        this.idPorNotas = new HeapMin(Cant_estudiantes);                                    // O(E)
+        this.idPorNotas = new HeapMin(Cant_estudiantes, estudiantes);                                    // O(E)
         this.examenCanonico = new Examen(ExamenCanonico.length);
         for (int p = 0; p < ExamenCanonico.length; p++) {
             this.examenCanonico.preguntas[p] = ExamenCanonico[p];
         }
         for (int i = 0; i < Cant_estudiantes; i++){                                         // O(E)
-            this.estudiantes[i] = new Estudiante(i, ExamenCanonico.length, ladoAula);       // O(R)
+            this.estudiantes[i] = new HandleEst(i, ExamenCanonico.length, ladoAula);       // O(R)
         }
     } // O(R) + O(1) + O(E) + O(1) + O(E) * O(R) = O(E*R)
     
@@ -204,8 +203,8 @@ public class Edr {
     public void consultarDarkWeb(int k, int[] examenDW) {
         int notaNueva = calcularNota(examenDW, this.examenCanonico.preguntas);
         int i = 0;
-        if(k <= this.cantEst){                                      // Si los que consultanDW son menos que la cant de est
-            if(k <= cantEst - cantEntregados){                      // Si hay menos personas que cantidad de entregados
+        if(k <= this.cantEstudiantes){                                      // Si los que consultanDW son menos que la cant de est
+            if(k <= cantEstudiantes - cantEntregados){                      // Si hay menos personas que cantidad de entregados
                 while(i < k){                                        // O(K)
                     int e = estEnAulaPorNotas.desencolar();                             // O(log E) como max
                     if(estudiantes[e].entrego == false){
@@ -218,11 +217,11 @@ public class Edr {
                 }
             }
             else{                                                   // Si k es mayor a cantEst - cantEntregados
-                intercambiarExamen(cantEst - cantEntregados, notaNueva, examenDW);
+                intercambiarExamen(cantEstudiantes - cantEntregados, notaNueva, examenDW);
             }
         }
         else{                                                       // Si todos los estudiantes consultanDW
-            intercambiarExamen(cantEst, notaNueva, examenDW);
+            intercambiarExamen(cantEstudiantes, notaNueva, examenDW);
         }
     }
 
@@ -288,10 +287,10 @@ public class Edr {
 
         // lleno el array de res con notasfinal de estudiantes, ordenadas de menor a mayor y desempatadas por menor id
 
-        NotaFinal[] res = new NotaFinal[(this.cantEst)];                // - O(E)
+        NotaFinal[] res = new NotaFinal[(this.cantEstudiantes)];                // - O(E)
         int i = 0;                                                      // - O(1)
 
-        while(i<this.cantEst){                                          // repito el cuerpo E-veces - O(E*(cuerpo))
+        while(i<this.cantEstudiantes){                                          // repito el cuerpo E-veces - O(E*(cuerpo))
             
             int id = idPorNotas.desencolar();                           // desencolo ids por nota al id con menor nota - O(log(E)) como maximo.
             Estudiante est = this.estudiantes[id];                      // obtengo el objeto de clase Estudiante corespondiente al id - O(1)
@@ -331,7 +330,7 @@ public class Edr {
         //para eso a todos los estudiantes que no se copiaron,
         // los agrego a otro array
 
-        int cantNoSospechosos = this.cantEst-this.cantSospechosos;        // cantidad de alumnos que no son sopechosos de copiarse - O(1)
+        int cantNoSospechosos = this.cantEstudiantes-this.cantSospechosos;        // cantidad de alumnos que no son sopechosos de copiarse - O(1)
         NotaFinal[] sinSospechosos = new NotaFinal[cantNoSospechosos];    // en el peor caso esto es de longitud E - O(E)
 
         int j = 0;                                                        // iterador sobre el array de notafinal de estudiantes sin copiones - O(1)
@@ -358,7 +357,7 @@ public class Edr {
 
         int k = 0;                                                      // inicializo el iterador - O(1)
 
-        while (k<this.cantEst){                                         // repito el cuerpo E-veces - O(E*(cuerpo))
+        while (k<this.cantEstudiantes){                                         // repito el cuerpo E-veces - O(E*(cuerpo))
 
             this.idPorNotas.encolar(k);                                 // encolo uno a uno cada estudiante con su id -O(log(E)) como maximo
             k = k + 1;
@@ -373,7 +372,7 @@ public class Edr {
     public int[] chequearCopias() {
         int[][] grilla = new int[this.cantPreguntas][10];               // Creo la grilla de calificaciones                     // O(R)
         int tramposos = 0;                                                                                                      // O(1)
-        for (int i = 0; i < cantEst; i++){                                                                                      // O(E)
+        for (int i = 0; i < cantEstudiantes; i++){                                                                                      // O(E)
             for (int j = 0; j < this.cantPreguntas; j++){                                                                       // O(R)
                 int respuesta = estudiantes[i].examen.preguntas[j];     // Guardo la respuesta                                  // O(1)
                 if (respuesta == -1){                                   // Si no respondio la pregunta, la saltea               // O(1)
@@ -382,8 +381,8 @@ public class Edr {
                 grilla[j][respuesta] +=1;                               // Sumo 1 a la posicion de la respuesta                 // O(1)
             } 
         } // O(E) * O(R) = O(E*R)
-        double umbral = (cantEst - 1) * 0.25;                           // Guardo el 25% de los alumnos                         // O(1)
-        for (int i = 0; i < cantEst; i++){                                                                                      // O(E)
+        double umbral = (cantEstudiantes - 1) * 0.25;                           // Guardo el 25% de los alumnos                         // O(1)
+        for (int i = 0; i < cantEstudiantes; i++){                                                                                      // O(E)
             for (int j = 0; j < cantPreguntas; j++){                                                                            // O(R)
                 int respuesta = estudiantes[i].examen.preguntas[j];     // Guardo la respuesta                                  // O(1)
                 if (respuesta == -1){                                   // Si no respondio la pregunta, la saltea               // O(1)
@@ -403,7 +402,7 @@ public class Edr {
         } // O(E) * O(R) = O(E*R)
         int[] res = new int[tramposos];                                                                                         // O(1)
         int k = 0;                                                                                                              // O(1)
-        for (int i = 0; i < cantEst; i++){                                                                                      // O(E)
+        for (int i = 0; i < cantEstudiantes; i++){                                                                                      // O(E)
             if (estudiantes[i].sospechoso){                             // Si es tramposo lo meto a la lista de tramposos       // O(1)
                 res[k] = i;                                                                                                     // O(1)
                 k++;                                                                                                            // O(1)

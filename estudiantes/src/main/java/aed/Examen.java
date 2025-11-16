@@ -3,7 +3,7 @@ package aed;
 // Crear Examen O(R)
 
 public class Examen {
-    private int[] preguntas;
+    int[] preguntas;
 
 //------------------------------------------------------------------------Constructor----------------------------------------------------------
 

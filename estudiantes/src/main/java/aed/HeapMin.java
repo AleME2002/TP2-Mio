@@ -1,7 +1,10 @@
-package aed; 
+package aed;
+
+import aed.Edr.HandleEst;
 
 public class HeapMin {
      private HandleEst[] heap;         // ids de estudiantes  
+     private int[] posEnHeapDeHandel;
      private int tamaño;         // cuántos hay realmente (por si desencolamos gente)
      private int capacidad;      // max. estudiantes que puede tener el heap (siempre = E)
 
@@ -12,20 +15,20 @@ public class HeapMin {
 //------------------------------------------------------------------------Constructor--------------------------------------------------
     
 
-    public HeapMin(int cantEstudiantes, Estudiante[] estudiantes) {
+    public HeapMin(int cantEstudiantes, HandleEst[] estudiantes) {
         this.capacidad = cantEstudiantes;                       // O(1)
         this.tamaño = cantEstudiantes;                          // O(1)
         this.heap = new HandleEst[cantEstudiantes];                // O(E)
-        this.posEnHeapDeHandel= new int[cantEstudiantes];
+        this.posEnHeapDeHandel = new int[cantEstudiantes];
         this.armarHeap(estudiantes);                                       // O(E)
     } // Complejidad: O(E)
 
-    private void armarHeap(Estudiante[] estudiantes) {
+    private void armarHeap(HandleEst[] estudiantes) {
         for (int i = 0; i < capacidad; i++) {                   // Recorre todos los estudiantes                        // O(E)
-            HandleEst h = new HandleEst(estudiantes[i]);        // creo el handles con mi estudiante                    // O(1)
+            HandleEst h = estudiantes[i];        // creo el handles con mi estudiante                    // O(1)
             heap[i] = h;                                        // Guarda el handle del estudiante en el heap           // O(1)
             h.cambiarPosicionEnHeap(i);                         // Registra en que posicion del heap esta ese id        // O(1)
-            this.posEnHeapDeHandel[i]=i;                        // registro la posciicon donde esta el handle en el heap.
+            this.posEnHeapDeHandel[h.obtenerId()]=i;                        // registro la posciicon donde esta el handle en el heap.
         }
     } // Complejidad: O(E)
     
