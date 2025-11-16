@@ -15,4 +15,13 @@ public class NotaFinal implements Comparable<NotaFinal> {
         }
         return Double.compare(this._nota, otra._nota);
     }
+
+    @Override
+    public boolean equals(Object otro) {
+        if (this == otro) return true;
+        if (otro == null || this.getClass() != otro.getClass()) return false;
+
+        NotaFinal other = (NotaFinal) otro;
+        return this._id == other._id && this._nota == other._nota;
+    }
 }
