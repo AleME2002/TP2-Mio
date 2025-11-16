@@ -1,62 +1,131 @@
 package aed;
 
-// Crear Examen O(R)
-
 public class Examen {
-    int[] preguntas;
+    private int[] preguntas;
 
-//------------------------------------------------------------------------Constructor----------------------------------------------------------
-
-    public Examen(int cantPreguntas){
-        this.preguntas = new int[cantPreguntas];                                        // O(R)
-        for (int i = 0; i < cantPreguntas; i++){                                        // O(R)
-            this.preguntas[i] = -1;                                                     // O(1)
+    // ---- CONSTRUCTOR ----
+    public Examen(int cantPreguntas) {
+        this.preguntas = new int[cantPreguntas];        // O(R)
+        for (int i = 0; i < cantPreguntas; i++) {       // O(R)
+            this.preguntas[i] = -1;                     // O(1)
         }
     } // Complejidad: O(R)
 
-    public int[] obtenerExamen(){
+
+    /*/ ¿QUÉ HAY EN ESTA CLASE?
+
+        - obtenerPreguntas() O(1)
+        - obtenerRespuesta(int nroPregunta) O(1)
+        - cantidadPreguntas() O(1)
+        - tienePreguntaRespondida(int nroPregunta) O(1)
+        - tienePreguntaSinResponder(int nroPregunta) O(1)
+
+        - resolverPregunta(int nroPregunta, int respuesta) O(|)
+        - cambiarTodasLasRespuestas(int[] nuevasRespuestas) O(1)
+
+        - cantidadPreguntasFaltantes(Examen examenAjeno) O(R)
+        - copiarPrimeraPregunta(Examen examenAjeno) O(R)
+        - encontrarPrimeraPreguntaParaCopiar(Examen examenAjeno) O(R)
+        - esRespuestaCorrecta(int nroPregunta, int respuestaCanonico) O(1)
+        - contarRespuestasCorrectas(int[] examenCanonico) O(R)
+
+    /*/
+
+
+    // ---- PARA OBTENER (getters)
+
+    public int[] obtenerPreguntas() {
         return this.preguntas;
-    }
+    } // O(1)
 
-    public void reolverPregunta()
+    public int obtenerRespuesta(int nroPregunta) {
+        return this.preguntas[nroPregunta];
+    } // O(1)
 
-//------------------------------------------------------------------------Preguntas faltantes--------------------------------------------------
+    public int cantidadPreguntas() {
+        return this.preguntas.length; 
+    } // O(1)
 
-    public int cantidadPreguntasFaltantes(Examen vecino){
-        int faltantes = 0;                                                                    // O(1)
-        for (int i = 0; i < this.preguntas.length; i++){                                // O(R)
-            if (this.preguntas[i] == -1 && vecino.preguntas[i] != -1)                   // O(1)
-                faltantes += 1;                                                               // O(1)
-        }
-        return faltantes;                                                                     // O(1)
-    }// Complejidad: O(R)
+    public boolean tienePreguntaRespondida(int nroPregunta) {
+        return this.preguntas[nroPregunta] != -1; 
+    } // O(1)
 
-//------------------------------------------------------------------------Copiar pregunta-------------------------------------------------------
+    public boolean tienePreguntaSinResponder(int nroPregunta) {
+        return this.preguntas[nroPregunta] == -1; 
+    } // O(1)
 
-//Esta mal. chequear
-    public void copiarPrimeraPregunta(Examen vecino){    
-        for (int i = 0; i < this.preguntas.length; i++) {
-            if (this.preguntas[i] == -1 &&vecino.preguntas[i] != -1) {
-                this.preguntas[i] = vecino.preguntas[i]; 
-            }
-        }
-        
-        
-        /*  // O(1)
-        while (encontre == false){                                                      // O(R)
-            for (int i = 0; i < this.preguntas.length; i++){                            // O(R)
-                if (this.preguntas[i] == -1 && vecino.preguntas[i] != -1){              // O(1)
-                    this.preguntas[i] = vecino.preguntas[i];                            // O(1)
-                    encontre = true;                                                    // O(1)
-                }
-            }
-        }*/
-    }
-    
 
-//----------- resolverPregunta 
+    // ---- PARA MODIFICAR (setters)
+
     public void resolverPregunta(int nroPregunta, int respuesta) {
-        preguntas[nroPregunta] = respuesta;
-    }
+        this.preguntas[nroPregunta] = respuesta; 
+    } // O(1)
+
+    public void cambiarTodasLasRespuestas(int[] nuevasRespuestas) {
+        int[] preguntas = new int[nuevasRespuestas.length];
+        for (int i = 0; i <nuevasRespuestas.length;i++){
+            preguntas[i]=nuevasRespuestas[i];
+        }
+        this.preguntas=preguntas;
+    } // O(1)
+
+
+    // ---- PARA OPERAR CON OTROS EXAMENES
+
+    // cuántas preguntas tiene sin responder que el otro examen si tiene respondidas 
+    public int cantidadPreguntasFaltantes(Examen examenAjeno) {
+        int faltantes = 0; 
+        for (int i = 0; i < this.preguntas.length; i++) {
+            if (this.tienePreguntaSinResponder(i) && !examenAjeno.tienePreguntaSinResponder(i)) {      
+                faltantes++;
+            }
+        }
+        return faltantes;
+    } // O(R)
+
+    // copia la primera pregunta que tengo sin responder y el otro tiene respondida 
+    public void copiarPrimeraPregunta(Examen examenAjeno) {
+        int copiadas = 0; // corto cuando se ponga en 1 
+
+        for (int i=0; i<this.preguntas.length; i++) {
+            if (this.tienePreguntaSinResponder(i) && !examenAjeno.tienePreguntaSinResponder(i) && copiadas == 0) {
+                this.preguntas[i] = examenAjeno.obtenerRespuesta(i); 
+                copiadas++; // ya sumo 1 y se debería cortar
+            }
+        }
+    } // O(R) en peor caso, O(1) en mejor caso  
+
+    // encuentra la primera pregunta para copiar
+    // REQUIERE QUE NO ESTEM TODAS RESPONDIDAS
+    // COMPLETAR Y VER ESTA ¡!!!!!!!!!!!!!!!!!¡!¡!!!!!!!!!¡!¡!¡!¡1¡1¡1¡!¡¡!!!!!!!!¡!¡!¡1¡!¡!¡1
+    public int encontrarPrimeraPreguntaParaCopiar(Examen examenAjeno) {
+        for (int i = 0; i<this.preguntas.length; i++) { 
+            if (this.tienePreguntaSinResponder(i) && !examenAjeno.tienePreguntaSinResponder(i)) {
+                return i; 
+            }
+        }
+        return -1; // POR SI NO ENCUENTRO NADA 
+    } // O(R)
+
+    public boolean esRespuestaCorrecta(int nroPregunta, int respuestaCanonico) {
+        return this.preguntas[nroPregunta] == respuestaCanonico; 
+    } // O(1)
+
+    // cuenta cuántas respuestas correctas tengo comparando con el canónico 
+    public int contarRespuestasCorrectas(int[] examenCanonico) {
+        int correctas = 0; 
+
+        for (int i=0; i<this.preguntas.length; i++) {
+            if (this.preguntas[i] != -1 && this.preguntas[i] == examenCanonico[i]) {
+                correctas++; 
+            }
+        }
+        return correctas;
+    } // O(R)
+
+
+
+
+
 
 }
