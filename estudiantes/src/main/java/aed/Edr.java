@@ -1,6 +1,5 @@
 package aed;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Edr {
 
@@ -9,7 +8,6 @@ public class Edr {
     private HeapMin idPorNotas;
     private int ladoAula;
     private int cantEst;
-    private int cantEntregados;
     private int cantSospechosos;
     private int cantPreguntas;
     // Usamos muchos atributos ya que no nos dieron limite de almacenamiento, pero muchos se pueden sacar de otro lado
@@ -30,7 +28,6 @@ public class Edr {
 
         this.ladoAula = LadoAula;                                                           // O(1)
         this.cantEst = Cant_estudiantes;                                                    // O(1)
-        this.cantEntregados = 0;                                                            // O(1)
         this.cantSospechosos = 0;
 
         this.cantPreguntas = ExamenCanonico.length;
@@ -181,7 +178,6 @@ public class Edr {
     //TERMIANDO
     public void entregar(int estudiante) {
         estudiantes[estudiante].obtenerEstudiante().marcarEntregado();  // O(1)
-        this.cantEntregados += 1;                                       // O(1)
         this.idPorNotas.actualizarNotaDesdeHandle(estudiantes[estudiante]); // O(log (E))
     }
 
