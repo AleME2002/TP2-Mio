@@ -14,7 +14,10 @@ public class Edr {
     private int cantPreguntas;
     // Usamos muchos atributos ya que no nos dieron limite de almacenamiento, pero muchos se pueden sacar de otro lado
 
-
+    public Estudiante obtenerEstudiante(int id) {
+        return this.estudiantes[id].obtenerEstudiante();
+    }
+    
 
 
 //-------------------------------------------------CREAR EDR-----------------------------------------------------------------------
@@ -93,22 +96,22 @@ public class Edr {
         if (vecinos.length == 0) {
             return est;
         }
-        Estudiante res = vecinos[0];                                                            // O(1)
-        int mayor = 0;                                                                          // O(1)
-        for (int i = 1; i < vecinos.length; i++){                                               // O(1) (Como maximo tiene 3 vecinos)
-            int contador = 0;                                                                   // O(1)
-            for (int j = 0; j < cantPreguntas; j++){                                            // O(R)
-                if (est.tienePreguntaSinResponder(j) && !vecinos[i].tienePreguntaSinResponder(j)){     // O(1)
-                    contador += 1;                                                              // O(1)
+        Estudiante res = null;
+        int mayor = -1;
+        for (int i = 0; i < vecinos.length; i++){
+            int contador = 0;
+            for (int j = 0; j < cantPreguntas; j++){
+                if (est.tienePreguntaSinResponder(j) && !vecinos[i].tienePreguntaSinResponder(j)){
+                    contador++;
                 }
             }
-            if (contador > mayor || (contador == mayor && vecinos[i].obtenerId()> res.obtenerId())) {            // O(1)
-            mayor = contador;                                                                   // O(1)
-            res = vecinos[i];                                                                   // O(1)
+            if (contador > mayor || (contador == mayor && (res == null || vecinos[i].obtenerId() > res.obtenerId()))) {
+                mayor = contador;
+                res = vecinos[i];
             }
         }
-        return res;                                                                             // O(1)
-    } // O(R)
+        return res;
+    }
 
     public boolean estaEnRango(Estudiante est, Estudiante vecino){
         if (est.obtenerFila() - 1 == vecino.obtenerFila() && est.obtenerColumna() == vecino.obtenerColumna()) {

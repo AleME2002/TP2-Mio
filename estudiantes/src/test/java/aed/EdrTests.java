@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 class EdrTests {
     Edr edr;
+    Edr edr2;
     int d_aula;
     int cant_alumnos;
     int[] solucion;
@@ -20,6 +21,7 @@ class EdrTests {
         solucion = new int[]{0,1,2,3,4,5,6,7,8,9};
 
         edr = new Edr(d_aula, cant_alumnos, solucion);
+        edr2 = new Edr(5, 6, solucion);
     }
 
     @Test
@@ -625,5 +627,34 @@ class EdrTests {
         };
 
         assertTrue(Arrays.equals(notas_finales_esperadas, notas_finales));
+    }
+
+    // aula d_aula=5, cant_alumnos=6, solucion = {0,1,2,3,4,5,6,7,8,9};
+
+    @Test
+    void alumno3_se_copia_de_0() {
+
+        edr2.resolver(0, 0, 0);   // 0 resuelve pregunta 0 bien
+        edr2.resolver(0, 3, 3);   // 0 resuelve pregunta 3 bien
+
+        edr2.copiarse(3);         
+
+        double[] notas = edr2.notas();
+        double[] esperado = new double[]{20.0, 0.0, 0.0, 10.0, 0.0, 0.0};
+        assertTrue(Arrays.equals(esperado, notas));
+    }
+
+    @Test
+    void alumno3_se_copia_varias_veces_de_0() {
+
+        edr2.resolver(0, 0, 0);      // 0 resuelve pregunta 0 bien
+        edr2.resolver(0, 2, 2);      // 0 resuelve pregunta 2 bien
+
+        edr2.copiarse(3);  // copia pregunta 0
+        edr2.copiarse(3);  // copia pregunta 2
+
+        double[] notas = edr2.notas();
+        double[] esperado = new double[]{20.0, 0.0, 0.0, 20.0, 0.0, 0.0};
+        assertTrue(Arrays.equals(esperado, notas));
     }
 }
