@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Edr {
-    private Estudiante[] estudiantes;
+    private HandleEst[] estudiantes;
     private Examen examenCanonico;
     private HeapMin idPorNotas;
     private HeapMin estEnAulaPorNotas;
@@ -15,7 +15,7 @@ public class Edr {
     // Usamos muchos atributos ya que no nos dieron limite de almacenamiento, pero muchos se pueden sacar de otro lado
 
     public class HandleEst {
-        private int posEnHeap; 
+        private int pos; 
         private Estudiante est; 
 
         private HandleEst(Estudiante e) { 
@@ -38,8 +38,12 @@ public class Edr {
             return this.est.obtenerId();                            // O(1)
         }
 
+        public int obtenerPosicion(){
+            return this.pos;
+        }
+
         public void cambiarPosicionEnHeap(int pos){
-            this.posEnHeap = pos;
+            this.pos = pos;
         }
         
         
@@ -81,7 +85,7 @@ public class Edr {
         }   
     }
 
-    
+
     // Se puede modificar si agregamos cosas
     public Edr(int LadoAula, int Cant_estudiantes, int[] ExamenCanonico){
         this.examenCanonico = new Examen(ExamenCanonico.length);                            // O(R)
