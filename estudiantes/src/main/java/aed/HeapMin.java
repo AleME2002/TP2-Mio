@@ -1,9 +1,7 @@
 package aed; 
 
 public class HeapMin {
-     private int[] heap;         // ids de estudiantes  
-     private int[] posiciones;   // posiciones[id] = índice en heap 
-     private double[] notas;        // notas[id] = nota actual 
+     private HandleEst[] heap;         // ids de estudiantes  
      private int tamaño;         // cuántos hay realmente (por si desencolamos gente)
      private int capacidad;      // max. estudiantes que puede tener el heap (siempre = E)
 
@@ -11,48 +9,99 @@ public class HeapMin {
 //------------------------------------------------------------------------Handle--------------------------------------------------------
 
 
-    public class Handle {
-        private int id; 
-        private HeapMin miHeap; 
+    public class HandleEst {
+        private int pos; 
+        private Estudiante est; 
 
-        private Handle(int id, HeapMin heap) { 
-            this.id = id;                                           // O(1)
-            this.miHeap = heap;                                     // O(1)
+        public HandleEst(Estudiante e) { 
+            this.est = e;                                           // O(1)
         }
 
-        public int id() {
-            return id;                                              // O(1)
+        public Estudiante obtenerEstudiante() {
+            return this.est;                                        // O(1)
         }
 
-        public double nota() {
-            return miHeap.notas[id];                                // O(1)
+        public double obtenerNota() {
+            return this.est.obtenerNota();                          // O(1)
         }
 
-        public void actualizarNota(double nuevaNota) {
-            miHeap.actualizarNotaDesdeHandle(id, nuevaNota);        // O(log E)
+        public boolean obtenerEntrego() {
+            return this.est.obtenerEstadoEntrega();                 // O(1)
         }
-    }
+
+        public int obtenerId() {
+            return this.est.obtenerId();                            // O(1)
+        }
+
+        public int obtenerPosicion() {
+            return this.pos;                            // O(1)
+        }
+
+        public void cambiarPosicionEnHeap(int pos){
+            this.pos = pos;
+        }
+        
+        
+        public int compareTo(HandleEst otro){
+            int idOriginal= this.obtenerId();
+            int idOtro = otro.obtenerId();
+
+            double notaOriginal = this.obtenerNota();
+            double notaOtro = otro.obtenerNota();
+
+            boolean estadoEntregaOriginal = this.obtenerEntrego();
+            boolean estadoEntregaOtro = otro.obtenerEntrego();
+
+            int res;
+
+            if( estadoEntregaOriginal != estadoEntregaOtro){  // caso uno entrego y otro no.
+
+                if(estadoEntregaOriginal == true){   // caso original  entrego y otro no. entonces original es menor.
+                    res=-1;
+                }
+                else{
+                    res =1;                         // caso original  no entrego y otro si. entonces original es mayor.
+                }
+            }
+            else{                                               // si ambos entregar tienen iguales, desempata menor nota.
+
+                if( notaOriginal != notaOtro){                  // caso no tienen notas iguales y tienen la misma entrego.
+
+                    if(notaOriginal > notaOtro){                // si el orginal tiene mayor nota que el otro, va a tener menor prioridad segun el criterio.
+                        res=-1;
+                    }
+                    else{
+                        res = 1;                                // si el original tiene menor nota que el otro, va a tener mayor prioridad segun el criterio.
+                    }
+                }
+                else{                                           // caso tienen mismo estado de entrega y misma nota
+
+                    if( idOriginal >= idOtro){
+                        res=-1;                                 // si tienen la misma nota, se prioriza el de menor id.
+                    }
+                    else{
+                        res=1;
+                    }
+                }
+            }
+            return res;
+        }   
+
+        //public vo id actualizarNota(double nuevaNota) {
+        //    miHea p.actualizarNotaDesdeHandle(id, nuevaNota);        // O(log E)
+        //} 
+    }   
 
 
 //------------------------------------------------------------------------Constructor--------------------------------------------------
     
 
     public HeapMin(int cantEstudiantes) {
-        this.capacidad = cantEstudiantes;                       // O(1)
-        this.tamaño = cantEstudiantes;                          // O(1)
-        this.heap = new int[cantEstudiantes];                   // O(E)
-        this.posiciones = new int[cantEstudiantes];             // O(E)
-        this.notas = new double[cantEstudiantes];               // O(E)
-        this.armarHeap();                                       // O(E)
-    } // Complejidad: O(E)
+        this.capacidad = cantEstudiantes;
+        this.tamaño = 0;
+        this.heap = new HandleEst[cantEstudiantes];
+    }
 
-    private void armarHeap() {
-        for (int i = 0; i < capacidad; i++) {         // Recorre todos los estudiantes                        // O(E)
-            heap[i] = i;                              // Guarda el ID del estudiante                          // O(1)
-            posiciones[i] = i;                        // Registra en que posicion del heap esta ese id        // O(1)
-            notas[i] = 0;                             // Asigna la nota inicial de ese estudiant              // O(1)
-        }
-    } // Complejidad: O(E)
     
     /*
     Primero se inicializan todas las estructuras internas del heap.
@@ -64,9 +113,11 @@ public class HeapMin {
 //------------------------------------------------------------------------Encolar--------------------------------------------------
 
 
-    public void encolar(int id) {
-        heap[tamaño] = id;              // Inserta el nuevo estudiante en la última posición libre del heap                       // O(1)
-        posiciones[id] = tamaño;        // Registra en qué posición del heap quedó almacenado ese estudiante                      // O(1)
+    public void encolar(HandleEst est) {
+        
+        heap[tamaño] = est;              // Inserta el handle del nuevo estudiante en la última posición libre del heap              // O(1)
+        est.cambiarPosicionEnHeap(tamaño);
+
         tamaño++;                       // Aumenta el tamaño del heap, ya que ahora contiene un elemento más                      // O(1)
         siftUp(tamaño - 1);             // Reacomoda el nuevo elemento hacia arriba si su nota es menor que la de su padre        // O(log E)
     } // Complejiidad: O(log E)
@@ -75,27 +126,44 @@ public class HeapMin {
 //------------------------------------------------------------------------Desencolar--------------------------------------------------
 
 
-    public int desencolar() {
-        int peorId = heap[0];               // Guarda el ID del estudiante con peor nota (raíz del heap)                      // O(1)
-        intercambiar(0, tamaño - 1);        // Intercambia la raíz con el último elemento del heap                            // O(1)
-        tamaño--;                           // Reduce el tamaño del heap, "eliminando" el último elemento (el peor)           // O(1)
-        siftDown(0);                        // Reacomoda el nuevo elemento en la raíz para restaurar el orden del heap        // O(log E)
-        return peorId;                      // Devuelve el ID del estudiante con peor nota                                    // O(1)
-    } // Complejidad: O(log E)
+    public Estudiante desencolar() {
+        if (tamaño == 0) {
+            return null;    // o lanzar exception, pero null está bien para TP
+        }
+        // El handle con la peor prioridad (la raíz)
+        HandleEst raiz = heap[0];
+        Estudiante peorEstudiante = raiz.obtenerEstudiante();
+        // Mover el último elemento a la raíz
+        intercambiar(0, tamaño - 1);
+        tamaño--;     // "Eliminamos" el último handle (el peor)
+        // Restaurar el heap
+        if (tamaño > 0) {    // evitar siftDown cuando queda vacío
+            siftDown(0);
+        }
+        return peorEstudiante;
+    }
+
 
 
 //------------------------------------------------------------------------Actualizar nota--------------------------------------------------
 
 
-    public void actualizarNotaDesdeHandle(int id, double nuevaNota) { 
-        double notaVieja = notas[id];          // Guarda la nota actual del estudiante antes de actualizarla           // O(1)
-        notas[id] = nuevaNota;              // Asigna la nueva nota al estudiante en el arreglo de notas            // O(1)
-        int pos = posiciones[id];           // Obtiene la posición actual del estudiante dentro del heap            // O(1)
-        if (nuevaNota < notaVieja)                                                                                  // O(1)
-            siftUp(pos);                    // Sube al estudiante en el heap hasta restaurar el orden               // O(log E)
-        else if (nuevaNota > notaVieja)                                                                             // O(1) 
-            siftDown(pos);                  // Baja al estudiante en el heap hasta restaurar el orden               // O(log E)
-    } // Complejidad: O(log E)
+    public void actualizarNotaDesdeHandle(Estudiante est, double nuevaNota) {
+
+        // Obtener el handle del estudiante
+        HandleEst h = est.obtenerHandle();
+        double notaVieja = est.obtenerNota();
+        // Actualizar la nota en el estudiante real
+        est.cambiarNota(nuevaNota);
+        int pos = h.obtenerPosicion();   // posición actual del handle en el heap
+        // Reacomodar en el heap según corresponda
+        if (nuevaNota < notaVieja) {
+            siftUp(pos);
+        } else if (nuevaNota > notaVieja) {
+            siftDown(pos);
+        }
+    }
+
 
     /*
     Este método actualiza la nota de un estudiante.
@@ -130,31 +198,34 @@ public class HeapMin {
             break;                                                   // Ya está en el lugar correcto
         intercambiar(pos, menor);                                    // O(1)
         pos = menor;                                                 // O(1)
+        }
     }
-} // Complejidad total: O(log E)
+ // Complejidad total: O(log E)
 
 
 //------------------------------------------------------------------------Extras--------------------------------------------------------
 
 
     public void intercambiar(int i, int j) { 
-        int idEnI = heap[i]; 
-        int idEnJ = heap[j]; 
+        HandleEst hEnI = heap[i]; 
+        HandleEst hEnJ = heap[j]; 
         
         // intercambiamos ids en el heap y actualizamos las posiciones
-        heap[i] = idEnJ;
-        heap[j] = idEnI;
-        posiciones[idEnI] = j;
-        posiciones[idEnJ] = i;
+        heap[i] = hEnJ;
+        heap[j] = hEnI;
+        hEnI.cambiarPosicionEnHeap(j);
+        hEnJ.cambiarPosicionEnHeap(i);
     }
 
+
+
+
     // USAR COMPARE TO ¿?
-    private boolean debeSubir(int i, int j) { 
-        int idPosI = heap[i];                                                                           
-        int idPosJ = heap[j]; 
-        boolean res = true;
-        // comparamos la nota. si es la misma, se desempata por menor id
-        if ((notas[idPosI] < notas[idPosJ]) || (notas[idPosI] == notas[idPosJ] && idPosI < idPosJ)) { 
+    private boolean debeSubir(int hijo, int padre) { 
+        HandleEst hEnHijo = heap[hijo];                                                                           
+        HandleEst hEnPadre = heap[padre]; 
+        boolean res;
+        if (hEnHijo.compareTo(hEnPadre)==1) {   // si el hijo tiene mayor prioridad que el padre, el hijo debe subir. 
             res = true; 
         } else {
             res = false;
@@ -162,18 +233,4 @@ public class HeapMin {
         return res; 
     }
 
-
-
-
-
-        // Complejidad = O(1)
-    public Handle obtenerHandle(int id) {
-        Handle handleParaId = new Handle(id, this); 
-        return handleParaId;
-    }
-
-    // TAL VEZ SIRVE ¿? BORRAR SI NO
-    public boolean vacio() {
-        return tamaño == 0;
-    }
 }

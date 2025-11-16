@@ -17,7 +17,6 @@ public class Edr {
     // Se puede modificar si agregamos cosas
     public Edr(int LadoAula, int Cant_estudiantes, int[] ExamenCanonico){
         this.examenCanonico = new Examen(ExamenCanonico.length);                            // O(R)
-        
         this.estudiantes = new Estudiante[Cant_estudiantes];                                // O(E)
         this.ladoAula = LadoAula;                                                           // O(1)
         this.cantEst = Cant_estudiantes;                                                    // O(1)
@@ -25,14 +24,24 @@ public class Edr {
         this.cantSospechosos = 0;
         this.cantPreguntas = ExamenCanonico.length;
         this.idPorNotas = new HeapMin(Cant_estudiantes);                                    // O(E)
-        this.estEnAulaPorNotas = new HeapMin(Cant_estudiantes);                             // O(E)
         this.examenCanonico = new Examen(ExamenCanonico.length);
         for (int p = 0; p < ExamenCanonico.length; p++) {
             this.examenCanonico.preguntas[p] = ExamenCanonico[p];
         }
-        for (int i = 0; i < Cant_estudiantes; i++){                                         // O(E)
-            this.estudiantes[i] = new Estudiante(i, ExamenCanonico.length, ladoAula);       // O(R)
+        for (int i = 0; i < Cant_estudiantes; i++) {                             
+            Estudiante e = new Estudiante(i, ExamenCanonico.length, ladoAula);
+            this.estudiantes[i] = e;
+
+            // Crear handle
+            HeapMin.HandleEst h = idPorNotas.new HandleEst(e);
+
+            // Encolarlo en el heap
+            idPorNotas.encolar(h);
+
+            // Guardar handle dentro del estudiante (opcional pero recomendado)
+            e.asignarHandle(h);
         }
+
     } // O(R) + O(1) + O(E) + O(1) + O(E) * O(R) = O(E*R)
     
 

@@ -12,6 +12,7 @@ public class Estudiante {
     boolean entrego;
     boolean sospechoso;
     Examen examen;
+    HeapMin.HandleEst handle;
 
 
 //------------------------------------------------------------------------Constructor--------------------------------------------------
@@ -35,6 +36,9 @@ public class Estudiante {
     } // O(1)
 
     //----Gets----
+    public HeapMin.HandleEst obtenerHandle(){
+        return this.handle;
+    }
 
     public int obtenerId() {
         return id; 
@@ -78,6 +82,10 @@ public class Estudiante {
 
 
     //----Sets----
+
+    public void asignarHandle(HeapMin.HandleEst h){
+        this.handle = h;
+    }
 
     public void entregar() {
         this.entrego = true; 
