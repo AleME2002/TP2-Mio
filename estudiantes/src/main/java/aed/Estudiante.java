@@ -3,7 +3,6 @@ package aed;
 // Crear estudiante O(R)
 
 public class Estudiante {
-<<<<<<< HEAD
     int id;
     int fila;
     int columna;
@@ -14,18 +13,6 @@ public class Estudiante {
     boolean sospechoso;
     Examen examen;
     HeapMin.HandleEst handle;
-=======
-    int id;
-    int fila;
-    int columna;
-    int correctas;
-    int respondidas;
-    double nota;
-    boolean entrego;
-    boolean sospechoso;
-    Examen examen;
-    HeapMin.HandleEst handle;
->>>>>>> 8e3e55ce72c3adb25511a31805e448d69ea3c64b
 
 
 //------------------------------------------------------------------------Constructor--------------------------------------------------
