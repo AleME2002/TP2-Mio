@@ -4,16 +4,16 @@ package aed;
 
 public class Estudiante {
 <<<<<<< HEAD
-    private int id;
-    private int fila;
-    private int columna;
-    private int correctas;
-    private int respondidas;
-    private double nota;
-    private boolean entrego;
-    private boolean sospechoso;
-    private Examen examen;
-    private HeapMin.HandleEst handle;
+    int id;
+    int fila;
+    int columna;
+    int correctas;
+    int respondidas;
+    double nota;
+    boolean entrego;
+    boolean sospechoso;
+    Examen examen;
+    HeapMin.HandleEst handle;
 =======
     int id;
     int fila;
